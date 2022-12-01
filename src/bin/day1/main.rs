@@ -2,13 +2,18 @@ use std::fs;
 
 fn main() {
     let input = fs::read_to_string("./src/bin/day1/input.txt").expect("read input");
-    let inventory = input.split("\n\n").into_iter().map(|inventory| {
-        inventory
-            .split("\n")
-            .into_iter()
-            .map(|calories| calories.parse::<i32>().unwrap_or(0))
-            .sum::<i32>()
-    });
-    let maximum = inventory.max().expect("numeric maximum");
-    println!("{:#?}", maximum);
+    let mut inventory: Vec<i32> = input
+        .split("\n\n")
+        .into_iter()
+        .map(|inventory| {
+            inventory
+                .split("\n")
+                .into_iter()
+                .map(|calories| calories.parse::<i32>().unwrap_or(0))
+                .sum()
+        })
+        .collect();
+    inventory.sort();
+    let top_three: i32 = inventory.iter().rev().take(3).sum();
+    println!("{:#?}", top_three);
 }
