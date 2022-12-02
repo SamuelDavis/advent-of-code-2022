@@ -21,9 +21,9 @@ fn calculate_score_from_tournament(input: String) -> i32 {
     input
         .lines()
         .map(|line| {
-            let (input, output) = line.split_once(' ').expect("input and output");
-            let theirs = get_shape_from_theirs(input).expect("theirs");
-            let yours = get_shape_from_yours(output).expect("yours");
+            let (theirs, yours) = line.split_once(' ').expect("input and output");
+            let theirs = get_shape_from_theirs(theirs).expect("theirs");
+            let yours = get_shape_from_yours(yours).expect("yours");
             let outcome = get_your_outcome_from_theirs_and_yours(&theirs, &yours);
 
             get_score_from_shape(&yours) + get_score_from_outcome(&outcome)
