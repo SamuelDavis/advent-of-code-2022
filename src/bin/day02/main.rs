@@ -21,14 +21,35 @@ fn calculate_score_from_tournament(input: String) -> i32 {
     input
         .lines()
         .map(|line| {
-            let (theirs, yours) = line.split_once(' ').expect("input and output");
+            let (theirs, outcome) = line.split_once(' ').expect("input and output");
             let theirs = get_shape_from_theirs(theirs).expect("theirs");
-            let yours = get_shape_from_yours(yours).expect("yours");
+            let outcome = get_outcome_from_str(outcome).expect("outcome");
+            let yours = get_shape_from_theirs_and_outcome(&theirs, &outcome);
             let outcome = get_your_outcome_from_theirs_and_yours(&theirs, &yours);
 
             get_score_from_shape(&yours) + get_score_from_outcome(&outcome)
         })
         .sum()
+}
+
+fn get_shape_from_theirs_and_outcome(theirs: &Shape, outcome: &Outcome) -> Shape {
+    match theirs {
+        Shape::Rock => match outcome {
+            Outcome::Lose => Shape::Scissors,
+            Outcome::Draw => Shape::Rock,
+            Outcome::Win => Shape::Paper,
+        },
+        Shape::Paper => match outcome {
+            Outcome::Lose => Shape::Rock,
+            Outcome::Draw => Shape::Paper,
+            Outcome::Win => Shape::Scissors,
+        },
+        Shape::Scissors => match outcome {
+            Outcome::Lose => Shape::Paper,
+            Outcome::Draw => Shape::Scissors,
+            Outcome::Win => Shape::Rock,
+        },
+    }
 }
 
 fn get_score_from_outcome(outcome: &Outcome) -> i32 {
@@ -79,11 +100,11 @@ fn get_shape_from_theirs(value: &str) -> Option<Shape> {
     }
 }
 
-fn get_shape_from_yours(value: &str) -> Option<Shape> {
+fn get_outcome_from_str(value: &str) -> Option<Outcome> {
     match value {
-        "X" => Some(Shape::Rock),
-        "Y" => Some(Shape::Paper),
-        "Z" => Some(Shape::Scissors),
+        "X" => Some(Outcome::Lose),
+        "Y" => Some(Outcome::Draw),
+        "Z" => Some(Outcome::Win),
         _ => None,
     }
 }
@@ -107,16 +128,16 @@ mod tests {
     }
 
     #[test]
-    fn test_get_shape_from_yours() {
+    fn test_get_outcome_from_str() {
         let data = vec![
-            ("X", Some(Shape::Rock)),
-            ("Y", Some(Shape::Paper)),
-            ("Z", Some(Shape::Scissors)),
+            ("X", Some(Outcome::Lose)),
+            ("Y", Some(Outcome::Draw)),
+            ("Z", Some(Outcome::Win)),
             ("W", None),
         ];
 
         for (input, expected) in data {
-            assert_eq!(expected, get_shape_from_yours(input));
+            assert_eq!(expected, get_outcome_from_str(input));
         }
     }
 
@@ -145,7 +166,29 @@ mod tests {
     #[test]
     fn test_calculate_score_from_tournament() {
         let input = "A Y\nB X\nC Z".to_string();
-        let expected = 15;
+        let expected = 12;
         assert_eq!(expected, calculate_score_from_tournament(input))
+    }
+
+    #[test]
+    fn test_get_shape_from_theirs_and_outcome() {
+        let data = vec![
+            (Shape::Rock, Outcome::Win, Shape::Paper),
+            (Shape::Rock, Outcome::Lose, Shape::Scissors),
+            (Shape::Rock, Outcome::Draw, Shape::Rock),
+            (Shape::Paper, Outcome::Win, Shape::Scissors),
+            (Shape::Paper, Outcome::Lose, Shape::Rock),
+            (Shape::Paper, Outcome::Draw, Shape::Paper),
+            (Shape::Scissors, Outcome::Win, Shape::Rock),
+            (Shape::Scissors, Outcome::Lose, Shape::Paper),
+            (Shape::Scissors, Outcome::Draw, Shape::Scissors),
+        ];
+
+        for (theirs, outcome, expected) in data {
+            assert_eq!(
+                expected,
+                get_shape_from_theirs_and_outcome(&theirs, &outcome)
+            );
+        }
     }
 }
