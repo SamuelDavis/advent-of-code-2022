@@ -1,7 +1,7 @@
 use std::fs;
 
 fn main() {
-    let input = fs::read_to_string("./src/bin/day1/input.txt").expect("read input");
+    let input = fs::read_to_string("./src/bin/day01/input.txt").expect("read input");
     let mut inventory: Vec<i32> = input
         .split("\n\n")
         .into_iter()
