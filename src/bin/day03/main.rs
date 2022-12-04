@@ -9,36 +9,36 @@ fn main() {
 }
 
 fn calculate_sum_of_inventory_priorities(input: &String) -> i32 {
-    input
-        .lines()
-        .map(|line| {
-            let (compartment_a, compartment_b) = derive_compartments(line.chars().collect());
-            derive_common_items(compartment_a, compartment_b)
+    let inventories = input.lines();
+
+    inventories
+        .to_owned()
+        .map(|line| line.chars().collect())
+        .collect::<Vec<HashSet<Item>>>()
+        .chunks(3)
+        .map(|group| {
+            let a = group[0].to_owned();
+            let b = group[1].to_owned();
+            let c = group[2].to_owned();
+            let y = derive_common_items(a.to_owned(), b.to_owned());
+            let z = derive_common_items(a.to_owned(), c.to_owned());
+
+            derive_common_items(y, z)
+                .into_iter()
+                .next()
+                .expect("one result")
         })
-        .flatten()
         .map(prioritize_item)
-        .sum::<Priority>()
+        .sum()
 }
 
-fn derive_common_items(
-    compartment_a: HashSet<Item>,
-    compartment_b: HashSet<Item>,
-) -> HashSet<Item> {
+fn derive_common_items(set_a: HashSet<Item>, set_b: HashSet<Item>) -> HashSet<Item> {
     let mut common_items = HashSet::new();
-    for item in compartment_a.intersection(&compartment_b).into_iter() {
+    for item in set_a.intersection(&set_b).into_iter() {
         common_items.insert(item.to_owned());
     }
 
     common_items
-}
-
-fn derive_compartments(items: Vec<Item>) -> (HashSet<Item>, HashSet<Item>) {
-    let items = items.into_iter();
-    let compartment_size = items.len() / 2;
-    let compartment_a: HashSet<Item> = items.to_owned().take(compartment_size).collect();
-    let compartment_b: HashSet<Item> = items.to_owned().skip(compartment_size).collect();
-
-    (compartment_a, compartment_b)
 }
 
 fn prioritize_item(item: Item) -> Priority {
@@ -67,7 +67,7 @@ mod tests {
             "CrZsJsPPZsGzwwsLwLmpwMDw",
         ]
         .join("\n");
-        assert_eq!(157, calculate_sum_of_inventory_priorities(&input));
+        assert_eq!(70, calculate_sum_of_inventory_priorities(&input));
     }
 
     #[test]
@@ -79,16 +79,6 @@ mod tests {
                 HashSet::from(['h', 'c', 's', 'F', 'M', 'M', 'f', 'F', 'F', 'h', 'F', 'p']),
             )
         )
-    }
-
-    #[test]
-    fn test_derive_compartments() {
-        let input = "vJrwpWtwJgWrhcsFMMfFFhFp".chars().collect();
-        let expected = (
-            HashSet::from(['v', 'J', 'r', 'w', 'p', 'W', 't', 'w', 'J', 'g', 'W', 'r']),
-            HashSet::from(['h', 'c', 's', 'F', 'M', 'M', 'f', 'F', 'F', 'h', 'F', 'p']),
-        );
-        assert_eq!(expected, derive_compartments(input));
     }
 
     #[test]
