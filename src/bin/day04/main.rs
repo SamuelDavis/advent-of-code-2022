@@ -1,6 +1,6 @@
 fn main() {
     let input = std::fs::read_to_string("./src/bin/day04/input.txt").expect("input");
-    println!("{}", find_fully_overlapping_ranges(input));
+    println!("{}", find_partially_overlapping_ranges(input));
 }
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ impl SectionAssignment {
     }
 
     pub fn overlaps(&self, other: &SectionAssignment) -> bool {
-        self.lower <= other.lower && self.upper >= other.upper
+        self.upper >= other.lower && self.lower <= other.upper
     }
 }
 
@@ -33,7 +33,7 @@ impl PartialEq<Self> for SectionAssignment {
     }
 }
 
-fn find_fully_overlapping_ranges(input: String) -> i32 {
+fn find_partially_overlapping_ranges(input: String) -> i32 {
     input.lines().fold(0, |acc, line| {
         let (a, b) = line.split_once(",").expect("csv");
         let a = SectionAssignment::from_str(a);
@@ -52,7 +52,7 @@ mod tests {
             "2-4,6-8", "2-3,4-5", "5-7,7-9", "2-8,3-7", "6-6,4-6", "2-6,4-8",
         ]
         .join("\n");
-        assert_eq!(2, find_fully_overlapping_ranges(input));
+        assert_eq!(4, find_partially_overlapping_ranges(input));
     }
 
     #[test]
