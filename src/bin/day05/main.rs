@@ -62,10 +62,9 @@ fn make_procedure_from_string(input: String) -> Procedure {
 
 fn execute_procedure(mut cargo: Cargo, procedure: Procedure) -> Cargo {
     for (count, from, to) in procedure {
-        for _ in 0..count {
-            let value = cargo[from - 1].pop().expect("supplies");
-            cargo[to - 1].push(value);
-        }
+        let final_length = cargo[from - 1].len() - count;
+        let mut tail = cargo[from - 1].split_off(final_length);
+        cargo[to - 1].append(&mut tail);
     }
     cargo
 }
@@ -88,7 +87,7 @@ mod tests {
             "move 1 from 1 to 2",
         ]
         .join("\n");
-        assert_eq!("CMZ", process(input));
+        assert_eq!("MCD", process(input));
     }
 
     #[test]
