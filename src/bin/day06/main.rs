@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::hash::Hash;
 
-const BUFFER_LENGTH: usize = 4;
+const BUFFER_LENGTH: usize = 14;
 
 fn main() {
     let input = std::fs::read_to_string("./src/bin/day06/input.txt").expect("input");
@@ -11,9 +11,9 @@ fn main() {
 fn find_unique_string_index(input: String) -> Option<usize> {
     let mut buffer = [' '; BUFFER_LENGTH];
     for (i, c) in input.char_indices() {
-        let j = i % 4;
+        let j = i % BUFFER_LENGTH;
         buffer[j] = c;
-        if i >= 4 && is_unique(buffer.to_owned()) {
+        if i >= BUFFER_LENGTH && is_unique(buffer.to_owned()) {
             return Some(i + 1);
         }
     }
@@ -36,10 +36,11 @@ mod tests {
     #[test]
     fn test_process_input() {
         let input = vec![
-            ("bvwbjplbgvbhsrlpgdmjqwftvncz", Some(5)),
-            ("nppdvjthqldpwncqszvftbrmjlhg", Some(6)),
-            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", Some(10)),
-            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", Some(11)),
+            ("mjqjpqmgbljsphdztnvjfqwrcgsmlb", Some(19)),
+            ("bvwbjplbgvbhsrlpgdmjqwftvncz", Some(23)),
+            ("nppdvjthqldpwncqszvftbrmjlhg", Some(23)),
+            ("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", Some(29)),
+            ("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", Some(26)),
         ];
         for (input, expected) in input {
             assert_eq!(expected, find_unique_string_index(input.to_string()))
